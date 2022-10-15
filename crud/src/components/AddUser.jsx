@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { addUser } from '../Service/api';
 import { onSuccess, onError } from '../helpers/alert';
-import {Formik,Field,Form,ErrorMessage} from 'formik'
-import * as Yup from "yup";
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 import {
   Button,
@@ -36,58 +36,67 @@ const Container = styled(FormGroup)`
         margin-top: 20px;
 `;
 const TextField1 = styled(TextField)`
-    width: 100%;
-    
-    
-        margin-top: 20px;
+  width: 100%;
+
+  margin-top: 20px;
 `;
 
-
 const AddUser = () => {
-  const buttonstyle = {marginTop:"5%", marginLeft:"40%"}
-  const [user, setUser] = useState(initialValue);
-  const { city, username, email, password, buttonText, error, success,isSubmitting } = user;
+  const buttonstyle = { marginTop: '5%', marginLeft: '40%' };
+
   let navigate = useNavigate();
 
-  const onValueChange = (e) => {
-    console.log(e.target.value);
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  // const onValueChange = (e) => {
+  //   console.log(e.target.value);
+  //   setUser({ ...user, [e.target.name]: e.target.value });
+  // };
   const validate = Yup.object().shape({
     city: Yup.string()
-      .min(4, "Must be 4 charecters or more")
-      .max(15, "Must be 15 characters or less")
-      .required("Required"),
+      .min(4, 'Must be 4 charecters or more')
+      .max(15, 'Must be 15 characters or less')
+      .required('Required'),
     username: Yup.string()
-      .min(4, "Must be 4 charecters or more")
-      .max(20, "Must be 20 characters or less")
-      .required("Required"),
+      .min(4, 'Must be 4 charecters or more')
+      .max(20, 'Must be 20 characters or less')
+      .required('Required'),
     email: Yup.string()
-      .email("Enter valid Email")
-      .required("Email is required"),
+      .email('Enter valid Email')
+      .required('Email is required'),
     password: Yup.string()
-      .min(6, "Password must be at least 6 charaters")
-      .required("Password is required")
+      .min(6, 'Password must be at least 6 charaters')
+      .required('Password is required'),
   });
-  
-  const onSubmit =  async(values,props) => {
-    setUser({ ...user, buttonText: 'Registering',isSubmitting:"true" });
-    const response=await addUser(user, setUser);
- 
-    console.log(response.status)
-    if(response.status===200){
-      onSuccess("User Added")
+  const [user, setUser] = useState(initialValue);
+  const {
+    city,
+    username,
+    email,
+    password,
+    buttonText,
+    error,
+    success,
+    isSubmitting,
+  } = user;
+  const onSubmit = async (values) => {
+    setUser({ ...values });
+    // console.log(user);
+    const response = await addUser(user);
+
+    if (response.status === 200) {
+      onSuccess('User Added');
+
+      this.setState({
+        ...user,
+        values,
+        buttonText: 'Register',
+        isSubmitting: '',
+      });
       navigate('/all');
-      setUser({ ...user, buttonText: 'Register' ,isSubmitting:""});
-      // navigate('/all');
-    }else{
-      onError("User Not Added")
-      // console.log(response)
-      setUser({ ...user, buttonText: 'Register' ,isSubmitting:""});
+    } else {
+      onError('User Not Added');
+      setUser({ ...user, values, buttonText: 'Register', isSubmitting: '' });
     }
     // // // a();
-
-
   };
 
   return (
@@ -96,22 +105,54 @@ const AddUser = () => {
       {error && onError}
       <Typography variant="h4">Add User</Typography>
 
-    <Formik initialValues={initialValue} validationSchema={validate} onSubmit={onSubmit}>
-        {(props)=>(
+      <Formik
+        initialValues={initialValue}
+        validationSchema={validate}
+        onSubmit={(values) => {
+          // same shape as initial values
+          onSubmit(values);
+        }}
+      >
+        {(props) => (
           <Form>
-
-        <Field as={TextField1}  fullWidth label="User Name" placeholder='Enter your name' name="username" helperText = {<ErrorMessage name="username"/>}
-           />
-        <Field as={TextField1}  fullWidth label="User Email" placeholder='Enter your Email' name="email"  helperText = {<ErrorMessage name="email"/>}
-         
-          id="my-input"/>
-        <Field as={TextField1}  fullWidth label="User password" placeholder='Enter your password' name="password" type="password" helperText = {<ErrorMessage name="password"/>}
-         
-          id="my-input"/>
-        <Field as={TextField1} o fullWidth label="User city" placeholder='Enter your city' name="city"  helperText = {<ErrorMessage name="city"/>}
-         
-          id="my-input"/>
-       {/* <FormControl>
+            <Field
+              as={TextField1}
+              fullWidth
+              label="User Name"
+              placeholder="Enter your name"
+              name="username"
+              helperText={<ErrorMessage name="username" />}
+            />
+            <Field
+              as={TextField1}
+              fullWidth
+              label="User Email"
+              placeholder="Enter your Email"
+              name="email"
+              helperText={<ErrorMessage name="email" />}
+              id="my-input"
+            />
+            <Field
+              as={TextField1}
+              fullWidth
+              label="User password"
+              placeholder="Enter your password"
+              name="password"
+              type="password"
+              helperText={<ErrorMessage name="password" />}
+              id="my-input"
+            />
+            <Field
+              as={TextField1}
+              o
+              fullWidth
+              label="User city"
+              placeholder="Enter your city"
+              name="city"
+              helperText={<ErrorMessage name="city" />}
+              id="my-input"
+            />
+            {/* <FormControl>
         <InputLabel htmlFor="my-input">Username</InputLabel>
         <Input
           onChange={(e) => onValueChange(e)}
@@ -120,7 +161,7 @@ const AddUser = () => {
           id="my-input"
         />
       </FormControl> */}
-      {/* <FormControl>
+            {/* <FormControl>
         <InputLabel htmlFor="my-input">Email</InputLabel>
         <Input
           onChange={(e) => onValueChange(e)}
@@ -147,22 +188,18 @@ const AddUser = () => {
           id="my-input"
         />
       </FormControl> */}
-      
-        <Button
-        style = {buttonstyle}
-          variant="contained"
-          color="primary"
-          type="submit"
-          disabled={isSubmitting}
-        >
 
-          {isSubmitting?"Submitting":buttonText}
-        </Button>
-     
-      </Form>
-        )
-    }  
-    </Formik>
+            <Button
+              style={buttonstyle}
+              variant="contained"
+              color="primary"
+              type="submit"
+            >
+              {buttonText}
+            </Button>
+          </Form>
+        )}
+      </Formik>
     </Container>
   );
 };

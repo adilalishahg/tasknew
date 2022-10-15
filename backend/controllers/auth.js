@@ -1,9 +1,9 @@
 const User = require('../models/users');
 const shortId = require('shortid');
-const jwt = require("jsonwebtoken")
+const jwt = require('jsonwebtoken');
 exports.register = (req, res) => {
   const { username, email, password, city } = req.body;
-  // console.log(username, email, password, city);
+  console.log(username, email, password, city);
 
   // // check if user exists in our db
   User.findOne({ email }).exec((err, user) => {
@@ -12,13 +12,14 @@ exports.register = (req, res) => {
         error: 'Email is taken1',
       });
     }
-    const name = shortId.generate();
-    const newUsers = new User({ name, username, email, city, password });
+    const _id = shortId.generate();
+    const newUsers = new User({ username, email, city, password });
 
     console.log(newUsers);
     // return newUsers;
     newUsers.save((err, result) => {
       if (err) {
+        return err;
         return res.status(401).json({
           error: 'error saving in db',
         });
@@ -61,7 +62,7 @@ exports.login = (req, res) => {
         expiresIn: '30s',
       }
     );
-    console.log(token)
+    console.log(token);
     return res.json({
       token,
       user: { _id, username, email },
@@ -113,8 +114,7 @@ exports.logout = (req, res) => {
   req.session.destroy((err) => {
     //delete session data from store, using sessionID in cookie
     if (err) throw err;
-    res.clearCookie("session-id"); // clears cookie containing expired sessionID
-    res.send("Logged out successfully");
+    res.clearCookie('session-id'); // clears cookie containing expired sessionID
+    res.send('Logged out successfully');
   });
 };
-
